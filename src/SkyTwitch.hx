@@ -1,11 +1,11 @@
 import sys.net.Host;
-import sys.ssl.Socket;
+import sys.net.Socket;
 using StringTools;
 
 class SkyTwitch {
     static function main() {
         var socket:Socket=new Socket();
-        socket.connect(new Host("irc.chat.twitch.tv"),6697);
+        socket.connect(new Host("irc.chat.twitch.tv"),6667);
         socket.output.writeString("pass " + Sys.args()[0] + "\n");
         socket.output.writeString("nick " + Sys.args()[1] + "\n");
         socket.output.writeString("join #" + Sys.args()[2] + "\n");
