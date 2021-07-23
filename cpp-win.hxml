@@ -1,0 +1,3 @@
+skytwitch.hxml
+-D toolchain=mingw
+--cpp bin/cpp
