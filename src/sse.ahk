@@ -1,12 +1,3 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-; #Warn  ; Enable warnings to assist with detecting common errors.
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+﻿setkeydelay 1 1
 winactivate Skyrim Special Edition
-send ~
-sleep 1
-send %1%
-sleep 1
-send {enter}
-sleep 1
-send ~
+send {``}%1%{enter}{``}
