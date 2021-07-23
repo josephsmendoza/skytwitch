@@ -14,7 +14,9 @@ class SkyTwitch {
             Sys.stdout().writeString(line+"\n");
             Sys.stdout().flush();
             if(line.startsWith("PING ")){
-                socket.output.writeString("PONG "+line.substring(5));
+                var pong="PONG "+line.substring(5)+"\n"
+                Sys.stdout().writeString(pong);
+                socket.output.writeString(pong);
             }else{
                 var index = line.indexOf("~");
                 if(index!=-1){
