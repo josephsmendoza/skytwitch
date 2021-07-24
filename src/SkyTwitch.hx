@@ -4,6 +4,7 @@ import sys.net.Socket;
 import sys.io.File;
 import haxe.Json;
 import haxe.Http;
+import haxe.Exception
 
 using StringTools;
 
@@ -24,10 +25,17 @@ class SkyTwitch {
 					trace("give point to " + user);
 					config.users[user]++;
 				}
+				var out=File.write("config.json");
+				out.writeString(Json.stringify(chatters));
+				out.flush();
 			}
 		}
 		while (true) {
+			try{
 			var line = socket.input.readLine();
+			}catch (Exception e){
+				main();
+			}
 			Sys.stdout().writeString(line + "\n");
 			Sys.stdout().flush();
 			if (line.startsWith("PING ")) {
