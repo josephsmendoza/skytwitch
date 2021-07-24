@@ -1,3 +1,4 @@
-﻿setkeydelay 1 1
-winactivate Skyrim Special Edition
-send {``}%1%{enter}{``}
+﻿winactivate Skyrim Special Edition
+setkeydelay 5 5
+setcapslockstate off
+send {shift up}{``}%1%{enter}{``}
