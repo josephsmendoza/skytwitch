@@ -21,6 +21,7 @@ class SkyTwitch {
 			new Timer(config.givePointTime * 1000).run = function() {
 				var chatters:Chatters = Json.parse(Http.requestUrl("http://tmi.twitch.tv/group/user/" + config.channel + "/chatters"));
 				for (user in chatters.chatters.viewers) {
+                    trace("give point to "+user);
 					config.users[user]++;
 				}
 			}
