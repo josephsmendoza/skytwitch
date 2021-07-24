@@ -17,11 +17,11 @@ class SkyTwitch {
 		socket.output.writeString("pass " + config.pass + "\n");
 		socket.output.writeString("nick " + config.user + "\n");
 		socket.output.writeString("join #" + config.channel + "\n");
-		if (config.givePointTime != null && config.givePointTime > 0) {
+		if (config.givePointTime > 0) {
 			new Timer(config.givePointTime * 1000).run = function() {
 				var chatters:Chatters = Json.parse(Http.requestUrl("http://tmi.twitch.tv/group/user/" + config.channel + "/chatters"));
 				for (user in chatters.chatters.viewers) {
-                    trace("give point to "+user);
+					trace("give point to " + user);
 					config.users[user]++;
 				}
 			}
@@ -37,7 +37,12 @@ class SkyTwitch {
 			} else {
 				var index = line.indexOf("~");
 				if (index != -1) {
-					Sys.command("sse", [line.substring(index + 1)]);
+					var command = line.substring(index + 1);
+					if (command == "help") {
+						socket.output.writeString("skyrimcommands.com\n");
+					} else {
+						Sys.command("sse", []);
+					}
 				}
 			}
 		}
