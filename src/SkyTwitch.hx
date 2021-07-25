@@ -4,7 +4,7 @@ import sys.net.Socket;
 import sys.io.File;
 import haxe.Json;
 import haxe.Http;
-import haxe.Exception
+import haxe.Exception;
 
 using StringTools;
 
@@ -15,9 +15,10 @@ class SkyTwitch {
 		config = Json.parse(File.getContent("config.json"));
 		var socket:Socket = new Socket();
 		socket.connect(new Host(config.host), config.port);
-		socket.output.writeString("pass " + config.pass + "\n");
-		socket.output.writeString("nick " + config.user + "\n");
-		socket.output.writeString("join #" + config.channel + "\n");
+		socket.output.writeString("pass " + config.pass + "\r\n");
+		socket.output.writeString("nick " + config.user + "\r\n");
+		socket.output.writeString("join #" + config.channel + "\r\n");
+		socket.output.flush();
 		if (config.givePointTime > 0) {
 			new Timer(config.givePointTime * 1000).run = function() {
 				var chatters:Chatters = Json.parse(Http.requestUrl("http://tmi.twitch.tv/group/user/" + config.channel + "/chatters"));
@@ -31,28 +32,31 @@ class SkyTwitch {
 			}
 		}
 		while (true) {
-			try{
-			var line = socket.input.readLine();
-			}catch (Exception e){
-				main();
-			}
+			var line=socket.input.readLine();
 			Sys.stdout().writeString(line + "\n");
-			Sys.stdout().flush();
 			if (line.startsWith("PING ")) {
-				var pong = "PONG " + line.substring(5) + "\n";
-				Sys.stdout().writeString(pong);
-				socket.output.writeString(pong);
+				var pong = "PONG " + line.substring(5);
+				Sys.stdout().writeString(pong+"\n");
+				socket.output.writeString(pong+"\r\n");
 			} else {
 				var index = line.indexOf("~");
 				if (index != -1) {
 					var command = line.substring(index + 1);
 					if (command == "help") {
-						socket.output.writeString("skyrimcommands.com\n");
+						var help="PRIVMSG ";
+						if(config.game.toLowerCase().startsWith("skyrim")){
+							help+="www.skyrimcommands.com";
+						}else{
+							help+="www.falloutcheats.com";
+						}
+						socket.output.writeString(help+"\r\n");
 					} else {
-						Sys.command("sse", []);
+						Sys.command("sse", [command]);
 					}
 				}
 			}
+			Sys.stdout().flush();
+			socket.output.flush();
 		}
 	}
 }
