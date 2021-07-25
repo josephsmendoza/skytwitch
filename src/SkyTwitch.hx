@@ -23,9 +23,9 @@ class SkyTwitch {
 			out.flush();
 		}
 		socket.connect(new Host(config.host), config.port);
-		socket.output.writeString("pass " + config.pass + "\r\n");
-		socket.output.writeString("nick " + config.user + "\r\n");
-		socket.output.writeString("join #" + config.channel + "\r\n");
+		socket.output.writeString("pass " + config.pass + "\n");
+		socket.output.writeString("nick " + config.user + "\n");
+		socket.output.writeString("join #" + config.channel + "\n");
 		socket.output.flush();
 		if (config.givePointTime > 0) {
 			Thread.create(function() {
@@ -51,21 +51,19 @@ class SkyTwitch {
 			var line = socket.input.readLine();
 			Sys.stdout().writeString(line + "\n");
 			if (line.startsWith("PING")) {
-				var pong = "PONG" + line.substring(4);
-				Sys.stdout().writeString(pong + "\n");
-				socket.output.writeString(pong + "\r\n");
+				var pong = "PONG" + line.substring(4) + "\n";
+				Sys.stdout().writeString(pong);
+				socket.output.writeString(pong);
 			} else {
 				var index = line.indexOf("~");
 				if (index != -1) {
 					var command = line.substring(index + 1);
 					if (command == "help") {
-						var help = "PRIVMSG ";
 						if (config.game.toLowerCase().startsWith("skyrim")) {
-							help += "www.skyrimcommands.com";
+							privmsg("www.skyrimcommands.com");
 						} else {
-							help += "www.falloutcheats.com";
+							privmsg("www.falloutcheats.com");
 						}
-						socket.output.writeString(help + "\r\n");
 					} else {
 						var user = line.substring(1, line.indexOf("!"));
 						userCall(user, command);
@@ -90,9 +88,10 @@ class SkyTwitch {
 			}
 		}
 		if (cost < 0) {
-			socket.output.writeString("PRIVMSG That command is banned!\r\n");
+			privmsg("That command is banned!");
 		} else if (cost > points) {
-			socket.output.writeString("PRIVMSG "+user+", you have "+points+" points, you need "+cost+" points. You get a point every "+config.givePointTime+" seconds.");
+			privmsg(user + ", you have " + points + " points, you need " + cost + " points. You get a point every "
+				+ config.givePointTime + " seconds.");
 		} else {
 			config.users[user] -= cost;
 			call(command);
@@ -101,5 +100,9 @@ class SkyTwitch {
 
 	static function call(command:String) {
 		Sys.command("sse", [command]);
+	}
+
+	static function privmsg(message:String) {
+		socket.output.writeString("PRIVMSG #" + config.channel + " :" + message + "\n");
 	}
 }
