@@ -1,4 +1,23 @@
 try:
+    import sys
+    class Tee(object):
+        def __init__(self, name, mode):
+            self.file = open(name, mode)
+            self.stdout = sys.stdout
+            self.stderr = sys.stderr
+            sys.stdout = self
+            sys.stderr = self
+        def __del__(self):
+            sys.stdout = self.stdout
+            sys.stderr = self.stderr
+            self.file.close()
+        def write(self, data):
+            self.stdout.write(data)
+            self.file.write(data)
+            self.file.flush()
+
+    Tee("log.txt","w")
+
     while(True):
         try:
             import jsonpickle
@@ -102,39 +121,60 @@ try:
 
     ahk = AHK()
 
-    def cmd(msg: str):
-        index = msg.find('~')
-        if(index == -1):
-            return
-        user = msg[1:msg.find("!")]
-        print(user+":")
-        msg = msg[index+1:]
-        print(msg)
-        if(msg.startswith("help")):
+    def isMod(user):
+        if user == config.channel: return True
+        chatters = Chatters(
+            **json.loads(requests.get("http://tmi.twitch.tv/group/user/" + config.channel + "/chatters").text))
+        return user in chatters.chatters["moderators"]
+
+    class Commands():
+        def user(user,cmd): # ~user username {+/-}#
+            if not isMod(user): return
+            user=cmd[1]
+            points=int(cmd[2])
+            if(user not in config.users): config.users[user]=0
+            config.users[user]+=points
+            open("config.json", "w").write(
+                jsonpickle.encode(config, unpicklable=False, indent=4))
+            sendMessage("gave "+user+" "+str(points)+" points")
+        def cost(user,cmd): # ~cost command string #
+            if not isMod(user): return
+            cost=int(cmd[-1])
+            cmd=" ".join(cmd[1:-1])
+            config.commands[cmd]=cost
+            open("config.json", "w").write(
+                jsonpickle.encode(config, unpicklable=False, indent=4))
+            sendMessage(cmd+" now costs "+str(cost)+" points")
+            if(cost<0): sendMessage("meaning it's banned")
+        def help(user,cmd): # ~help
             sendMessage(config.help)
-            return
-        cost = config.defaultCost
-        for cmd, price in config.commands:
-            if(msg.startswith(cmd)):
-                cost = price
-                break
-        if(cost < 0):
-            sendMessage(user+" that command is banned")
-            return
-        if(user not in config.users):
-            config.users[user] = 0
-        if(config.users[user] < cost):
-            sendMessage(
-                user+" has "+config.users[user]+" ponts, needs "+cost+" points")
-            return
-        game = ahk.find_window_by_title(config.game.encode())
-        game.activate()
-        ahk.set_capslock_state(False)
-        ahk.key_up("shift")
-        ahk.send("~")
-        ahk.send(msg)
-        ahk.key_press("enter")
-        ahk.send("~")
+        def cmd(user,cmd): # default
+            msg=" ".join(cmd)
+            cost = config.defaultCost
+            for cmd in config.commands:
+                if(msg.startswith(cmd)):
+                    cost = config.commands[cmd]
+                    break
+            if(cost < 0):
+                sendMessage(user+" that command is banned")
+                return
+            if(user not in config.users):
+                config.users[user] = 0
+            if(config.users[user] < cost):
+                sendMessage(
+                    user+" has "+str(config.users[user])+" ponts, needs "+str(cost)+" points")
+                return
+            game = ahk.find_window_by_title(config.game.encode())
+            game.activate()
+            ahk.set_capslock_state(False)
+            ahk.key_up("shift")
+            ahk.send("~")
+            ahk.send(msg)
+            ahk.key_press("enter")
+            ahk.send("~")
+            if(cost==0): return
+            config.users[user]-=cost
+            sendMessage(user+" now has "+str(config.users[user])+" points")
 
     while(True):
         msg = sock.recv(1024).decode()
@@ -145,7 +185,19 @@ try:
         if(msg.startswith("PING")):
             send("PONG"+msg[4:-1])
             continue
-        cmd(msg)
+        msg=msg.lower()
+        index = msg.find('~')
+        if(index == -1):
+            continue
+        user = msg[1:msg.find("!")]
+        print(user+":")
+        msg = msg[index+1:].split()
+        print(" ".join(msg)+"\n")
+        try:
+            getattr(Commands,msg[0],Commands.cmd)(user,msg)
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc()+"\n")
 
 except Exception:
     import traceback
