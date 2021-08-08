@@ -42,9 +42,9 @@ try:
         password: str = "https://twitchapps.com/tmi/"
         username: str = "nobody"
         channel: str = "nowhere"
-        game: str = "Skyrim"
         givePointTime: int = 0
         defaultCost: int = 0
+        game: str = "Skyrim"
         help: str = "www.skyrimcommands.com"
         ssl: bool = True
         host: str = "irc.chat.twitch.tv"
