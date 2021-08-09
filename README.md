@@ -3,10 +3,6 @@ This program allows twitch chat to send raw console commands into Creation Engin
 ## Twitch points
 This program uses it's own points system, and currently has no integration with the Twitch points system for affiliates and partners. If I do implement that feature, it will not be availible in builds provided by me for free.
 ## Requirements
-[Python](https://www.python.org/downloads/) 3.9+
-
-[pip](https://pip.pypa.io/en/stable/installation/) (should come with python)
-
 [AutoHotKey](https://www.autohotkey.com/)
 ## Quick Setup
 Run the program once to generate a template config file in the same folder as the program, then open that up. [Generate a login token](https://twitchapps.com/tmi/) and paste it inside the quotes next to `"password":`, replacing the url that was there. Replace `nobody` and `nowhere` with your username, all lowercase. If you want to use the points system, set `givePointTime` to the number of seconds a viewer must watch to earn a point, and `defaultCost` to the number of points sending a command should cost. If you're playing a different game, replace `Skyrim` with the window title of the game, for example `Fallout`. It doesn't need to be the full title, the first word will work fine. Then change the help url to a relevant link, for example [www.falloutcheats.com](https://www.falloutcheats.com). Don't include `https://` in the link, since twitch will hide it anyways. Now you can start the program let twitch chat control your console. Make sure to play with a controller so that you don't end up typing into the console when it opens and messing up the commands.
@@ -30,3 +26,5 @@ Once you have the bot account, you can [generate a login token](https://twitchap
 The following settings shouldn't need to be changed unless Twitch changes their IRC api, or you have an edge case setup. When `ssl` is `true`, communications to the IRC server (twitch) is encrypted. Turning this off is a bad idea, because your password will be sent unencrypted without it, allowing anyone on your network or on the way to the server to see it. Set to `false` to disable encryption. `host` is the name of the server to connect to, and `port` is the port number to connect to on the host. You shouldn't change this unless you already understand what they mean.
 
 The following settings can be set via chat commands, and their syntax in the file is not obvious, so you'll probably want to use the commands to set them. `users` contains a list of all known viewers and their points. `commands` contains the list of commands with set costs.
+## Building/Running from Source
+Python 3.9+ and AutoHotKey are currently the only requirements. Eventually I hope to remove AutoHotKey so that this program can run on multiple operating systems, but for now that means Windows. The file [build.cmd](https://github.com/josephsmendoza/skytwitch/blob/master/build.cmd) is the script used to set up the build environment and then build the file on the releases page, or you could use [skytwitch.py](https://github.com/josephsmendoza/skytwitch/blob/master/skytwitch.py) directly for a much smaller program size.
