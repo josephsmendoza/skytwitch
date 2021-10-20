@@ -18,6 +18,10 @@ try:
 
     Tee("log.txt","w")
 
+except Exception:
+    import traceback
+    input(traceback.format_exc())
+
     while(True):
         try:
             import jsonpickle
