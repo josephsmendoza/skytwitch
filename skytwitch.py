@@ -16,50 +16,50 @@ try:
             self.file.write(data)
             self.file.flush()
 
-    Tee("log.txt","w")
+    Tee("skytwitch.log","w")
 
 except Exception:
     import traceback
     input(traceback.format_exc())
 
-    while(True):
-        try:
-            import jsonpickle
-            import ahk
-            break
-        except ModuleNotFoundError as e:
-            import os
-            os.system("pip install "+e.name)
+while(True):
+    try:
+        import jsonpickle
+        import ahk
+        break
+    except ModuleNotFoundError as e:
+        import os
+        os.system("pip install "+e.name)
 
-    from ahk import AHK
-    from dataclasses import dataclass, field
-    import jsonpickle
-    import json
-    import sys
+from ahk import AHK
+from dataclasses import dataclass, field
+import jsonpickle
+import json
+import sys
 
-    @dataclass
-    class Config:
+@dataclass
+class Config:
     games: list[str] = field(default_factory=["Skyrim","Fallout"])
 
-    try:
-        config = Config(**json.loads(open("config.json", "r").read()))
-        open("config.json", "w").write(
-            jsonpickle.encode(config, unpicklable=False, indent=4))
-    except FileNotFoundError:
-        config = Config()
-        open("config.json", "x").write(
-            jsonpickle.encode(config, unpicklable=False, indent=4))
+try:
+    config = Config(**json.loads(open("skytwitch.json", "r").read()))
+    open("skytwitch.json", "w").write(
+        jsonpickle.encode(config, unpicklable=False, indent=4))
+except FileNotFoundError:
+    config = Config()
+    open("skytwitch.json", "x").write(
+        jsonpickle.encode(config, unpicklable=False, indent=4))
 
-    ahk = AHK()
+ahk = AHK()
 for title in config.games :
     game = ahk.find_window_by_title(title.encode())
     if game:
-                    break
-            game.activate()
+        break
+game.activate()
 game.activate_bottom()
-            ahk.set_capslock_state(False)
-            ahk.key_up("shift")
+ahk.set_capslock_state(False)
+ahk.key_up("shift")
 ahk.key_press("~")
 ahk.send(" ".join(sys.argv[1:]).replace("~", ""))
-            ahk.key_press("enter")
+ahk.key_press("enter")
 ahk.key_press("~")
