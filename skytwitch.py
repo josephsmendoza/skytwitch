@@ -170,6 +170,7 @@ except Exception:
                 return
             game = ahk.find_window_by_title(config.game.encode())
             game.activate()
+game.activate_bottom()
             ahk.set_capslock_state(False)
             ahk.key_up("shift")
             ahk.send("~")
