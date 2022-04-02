@@ -15,6 +15,8 @@ try:
             self.stdout.write(data)
             self.file.write(data)
             self.file.flush()
+        def flush(*args):
+            pass
 
     Tee("skytwitch.log","w")
 
@@ -36,6 +38,7 @@ from dataclasses import dataclass, field
 import jsonpickle
 import json
 import sys
+import time
 
 @dataclass
 class Config:
