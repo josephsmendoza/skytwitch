@@ -1,38 +1,19 @@
 try:
-    import sys
-    class Tee(object):
-        def __init__(self, name, mode):
-            self.file = open(name, mode)
-            self.stdout = sys.stdout
-            self.stderr = sys.stderr
-            sys.stdout = self
-            sys.stderr = self
-        def __del__(self):
-            sys.stdout = self.stdout
-            sys.stderr = self.stderr
-            self.file.close()
-        def write(self, data):
-            self.stdout.write(data)
-            self.file.write(data)
-            self.file.flush()
-        def flush(*args):
-            pass
-
-    Tee("skytwitch.log","w")
-
+    import pip
+    pip.main(['install','ahk','elevate','dataclasses','jsonpickle'])
 except Exception:
-    import traceback
-    input(traceback.format_exc())
+    from traceback import print_exc
+    print('An exception occured during dependancy checks')
+    print_exc()
+    print('please ensure ahk and elevate are installed')
 
-while(True):
-    try:
-        import jsonpickle
-        import ahk
-        break
-    except ModuleNotFoundError as e:
-        import os
-        os.system("pip install "+e.name)
+from elevate import elevate
+elevate()
 
+import tee
+tee.Tee("skytwitch.log", "w")
+
+from time import sleep
 from ahk import AHK
 from dataclasses import dataclass, field
 import jsonpickle
@@ -53,16 +34,30 @@ except FileNotFoundError:
     open("skytwitch.json", "x").write(
         jsonpickle.encode(config, unpicklable=False, indent=4))
 
+open('skytwitch.txt','w').close()
 ahk = AHK()
-for title in config.games :
-    game = ahk.find_window_by_title(title.encode())
-    if game:
-        break
-game.activate()
-game.activate_bottom()
-ahk.set_capslock_state(False)
-ahk.key_up("shift")
-ahk.key_press("~")
-ahk.send(" ".join(sys.argv[1:]).replace("~", ""))
-ahk.key_press("enter")
-ahk.key_press("~")
+print('SkyTwitch ready')
+while True:
+    command=''
+    with open('command.txt','r+') as file:
+        command=file.read().replace('~', '')
+        file.seek(0)
+        file.truncate()
+    if not command:
+        sleep(1)
+        continue
+    print(command)
+    for title in config.games :
+        game = ahk.find_window_by_title(title.encode())
+        if game:
+            break
+    pre=ahk.get_active_window()
+    game.activate()
+    game.activate_bottom()
+    ahk.set_capslock_state("off")
+    ahk.key_up("shift")
+    script_text='blockinput on\nsendinput ``\nsleep 100\nsendraw '+command+'\nsleep 100\nsendinput {enter}\nsleep 100\nsendinput ``'
+    ahk.run_script(script_text)
+    pre.activate()
+    pre.activate_bottom()
+    
