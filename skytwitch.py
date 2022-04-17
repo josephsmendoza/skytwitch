@@ -39,7 +39,7 @@ ahk = AHK()
 print('SkyTwitch ready')
 while True:
     command=''
-    with open('command.txt','r+') as file:
+    with open('skytwitch.txt','r+') as file:
         command=file.read().replace('~', '')
         file.seek(0)
         file.truncate()
