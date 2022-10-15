@@ -6,4 +6,4 @@ This program allows you to send raw console commands into Creation Engine games.
 All other dependencies are handled automatically so long as pip is installed
 ## Support
 - Get support via [Discord](https://discord.gg/PbGT9tVWTC)
-- Give support via [PayPal](https://paypal.me/SugoiDogo)
+- Give support via [Ko-Fi](https://ko-fi.com/sugoidogo)
