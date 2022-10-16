@@ -5,4 +5,4 @@ This program allows you to send raw console commands into Creation Engine games.
 
 All other dependencies are handled automatically so long as pip is installed
 ## Support
-Support information for all my software is on my [GitHub profile](github.com/sugoidogo)
+Support information for all my software is on my [GitHub profile](https://github.com/sugoidogo)
